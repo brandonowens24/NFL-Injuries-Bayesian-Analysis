@@ -1,5 +1,5 @@
 # A Bayesian Analysis on NFL Injuries
-Author: Brandon Owens
+Author: Brandon Owens <br></br>
 Date: 4/10/2024
 
 ## Background
