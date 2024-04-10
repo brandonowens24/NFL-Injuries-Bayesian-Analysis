@@ -22,7 +22,7 @@ Have these significant rule changes that have caused controversy really impacted
 Drawing on information from 2009-2013, we use this prior knowledge to inform a binomial likelihood of the number of players that get hurt in a season compared to all players in the National Football League. This allows us to form beta posterior distributions of what we can confidently predict the percentage of players we'd have expected to have gotten hurt from the 2014-2023 seasons. We are interested in analyzing **if protocols set by the NFL to reduce player injury are successful or not over the last 10 years**.
 
 ## Findings
-![Posterior Distributions](./images/ridge_posteriors)
+![Posterior Distributions](./images/ridge_posteriors.png)
 
 The most massive of the posterior distribution shifts comes in 2016, where previously the distributions greatly reflected the prior. With this large shift, it is hard to tell if one rule specifically caused the change, both rules together did, or with the new rules, there was a crackdown on officiating. 
 
