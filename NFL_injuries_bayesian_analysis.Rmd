@@ -264,7 +264,6 @@ ggplot(melted_df, aes(x = value, y = year, group=year, fill=year)) +
   xlab("Theta (Pct. of Players Injured)") +
   ylab("Year") +
   scale_y_discrete(limits=rev) +
-  scale_x_reverse() +
   annotate(
     geom = "label", x = middle_ci, y = 0.5,
     label = "Prior 95% CI", angle=90
