@@ -30,7 +30,7 @@ Have these significant rule changes that have caused controversy really impacted
 Drawing on information from 2009-2013, we use this prior knowledge to inform a binomial likelihood of the number of players that get hurt in a season compared to all players in the National Football League. This allows us to form beta posterior distributions of what we can confidently predict the percentage of players we'd have expected to have gotten hurt from the 2014-2023 seasons. We are interested in analyzing **if protocols set by the NFL to reduce player injury are successful or not over the last 10 years**.
 
 
-## Install Necessary Packages
+#### Install Necessary Packages
 ```{r Load_Libraries}
 library(dplyr)
 library(nflfastR)
@@ -47,7 +47,7 @@ library(cowplot)
 ```
 
 ## Read In Data
-### Retrieve Players of Interest
+#### Retrieve Players of Interest
 ```{r load_pbp}
 injury <- nflreadr::load_injuries(2009:2023)
 injury <- injury[!duplicated(injury[c("full_name", "season")]),]
@@ -109,9 +109,8 @@ Obviously many of these injuries will come from practice, where players are tryi
 df
 ```
 ### EDA:
-
 ```{r visualizations}
-ggplot(data = df, aes(x = as.factor(year))) +
+p1 <- ggplot(data = df, aes(x = as.factor(year))) +
   geom_bar(aes(y = number_of_players, fill = "Total Players"), stat = "identity", position = "dodge") +
   geom_bar(aes(y = distinct_injuries, fill = "Total Players Injured"), stat = "identity", position = "dodge") +
   scale_fill_manual(values = c("Total Players" = "blue", "Total Players Injured" = "red"), name="Legend") +
@@ -123,6 +122,7 @@ ggplot(data = df, aes(x = as.factor(year))) +
     axis.title.y = element_text(face="bold")
   )
   
+print(p1)
 ```
 I wanted to get a graphical representation of what the data looked like here. It seems that although the number of players being used in the league (blue) is increasing through the years (slightly, now), there seems to be more uniformity with the total players that were injured.
 
@@ -230,7 +230,7 @@ final <- burned_df[k*(1:N), ]
 ```
 
 
-### Convergence Plots
+#### Convergence Plots
 ```{r plot_conv}
 plot(final[,11], type="l", main="2014")
 plot(final[,12], type="l", main="2015")
@@ -269,7 +269,7 @@ melted_df$value <- as.numeric(melted_df$value)
 
 ### Plots and Discussion
 ```{r plots}
-p1 <- ggplot(melted_df, aes(x = value, y = year, group=year, fill=year)) +
+p2 <- ggplot(melted_df, aes(x = value, y = year, group=year, fill=year)) +
   geom_rect(aes(xmin=lower_ci,xmax=higher_ci,ymin=0,ymax=Inf),fill="grey",alpha=.2) +
     geom_density_ridges() +
   geom_vline(xintercept=c(lower_ci, middle_ci, higher_ci),
@@ -289,7 +289,7 @@ p1 <- ggplot(melted_df, aes(x = value, y = year, group=year, fill=year)) +
     label = "Prior 95% CI", angle=90
   )
 
-print(p1)
+print(p2)
 ```
 
 
@@ -327,7 +327,7 @@ The most massive of the posterior distribution shifts comes in 2016, where previ
 
 
 ### Conclusion Part 1
-While there is evidence to demonstrate that the inclusion of these rules is indeed helping to keep athletes safer and dismiss the claims of unruly fans who believe these tweaks are unwarranted, it is unclear if the rule changes are *fully* responsible for the decrease in injury rate. Tightening of officiating is thought to be another major cause although this type of metric is much more difficult to express. This should be explored further.
+While there is evidence to demonstrate that the injury rate in the NFL has improved in the last ten years (especially compared to early years) it is unclear if the rule changes are *fully* responsible for the decrease in injury rate. Tightening of officiating is thought to be another major cause although this type of metric is much more difficult to express. This should be explored further.
 
 Additionally, while cleaning the data, I opted to use a binomial model due to ease. The problem with this method lies in one distinct area:
 * Players are only classified as `injured_during_season` or `not_injured_during_season`.
@@ -340,14 +340,13 @@ Additionally, while cleaning the data, I opted to use a binomial model due to ea
 
 While analyzing the results from Part 1: Injury Analysis, my professor made some feedback on my project proposal. He mentioned that I could also analyze player durability through age bins within the data. I thought this was a fantastic idea and could possibly provide some insight to my part 1 analysis!
 
-More specifically, what if there's a chance that the new acquisition of skill in the NFL isn't as good as it once was. This would cause the league to have to hold onto older players... 
+More specifically, what if there's a chance that the new acquisition of skill in the NFL isn't as good as it once was? This could potentially cause the league to have to hold onto older players... 
 
-Older players would most likely infer higher injury rates, as it is commonly studied that older athletes struggle to maintain power, speed, and muscle mass as they age. So as a way to test this theory or the composition of ages in the NFL and see if there's any connection, we dove into some player background data...
-
+Older players theoretically should elicit higher injury rates, as it is commonly studied that older athletes struggle to maintain power, speed, and muscle mass as they age. So as a way to test this theory or the composition of ages in the NFL and see if there's any connection, we dive into some player background data...
 
 
 ## Part 2: Age Analysis
-### Age Data Cleaning
+#### Age Data Cleaning
 
 ```{r age, warning=FALSE}
 players$age = ifelse(!is.na(players$birth_date), as.numeric(players$season) - as.numeric(format(as.Date(players$birth_date), "%Y")), players$years_exp + 22)
@@ -443,7 +442,7 @@ melted_df <- dfage %>%
 ```
 
 ```{r part2_plot1}
-ggplot(data = melted_df, aes(x = as.factor(year), y = value, fill = name)) +
+p3 <- ggplot(data = melted_df, aes(x = as.factor(year), y = value, fill = name)) +
   geom_bar(stat = "identity", position = "stack") +
   ggtitle("Logged Player Age Ranges per Season") +
   xlab("Season") + ylab("Count") +
@@ -461,6 +460,8 @@ ggplot(data = melted_df, aes(x = as.factor(year), y = value, fill = name)) +
     axis.title.y = element_text(face = "bold"),
     legend.title = element_text(face = "bold")
   )
+
+print(p3)
 ```
 
 We comprise the makeup of players with actual logged ages for our years of interest in the league. It seems our original hypothesis may not be as strong as we initially hoped. In other words, we notice:
@@ -479,7 +480,7 @@ melted_df <- dfage %>%
 
 
 ```{r part2_plot2}
-ggplot(data = melted_df, aes(x = as.factor(year), y = value, fill = name)) +
+p4 <- ggplot(data = melted_df, aes(x = as.factor(year), y = value, fill = name)) +
   geom_bar(data = filter(melted_df, name == "number_of_players_age_listed"), 
            aes(x = as.factor(year), y = value, fill = name),
            stat = "identity", position = "dodge") +
@@ -504,6 +505,8 @@ ggplot(data = melted_df, aes(x = as.factor(year), y = value, fill = name)) +
     axis.title.y = element_text(face = "bold"),
     legend.title = element_text(face="bold")
   )
+
+print(p4)
 ```
 
 This plot pretty clearly demonstrates that older players actually aren't the ones getting hurt! Who would have thought! Some possible reasons for this finding may be that:
@@ -513,7 +516,6 @@ This plot pretty clearly demonstrates that older players actually aren't the one
 
 So maybe age does play a difference, just not in the way that we thought.
 
-### Modelling
 ```{r players_age_df}
 players <- players[!is.na(players$age),]
 
@@ -541,8 +543,13 @@ players_age <- players %>%
 
 ```
 
+### Modelling
 
-#### Prior and Hyperparameters
+#### Which Age Bin Dominates the League?
+##### Prior and Hyperparameters
+
+It seems logical to start with some modelling to see how the composition of ages in the league has changed over time. With this, a multinomial likelihood model (with Dirichlet conjugacy for ease) seems like the appropriate route to estimate the percent compositions of these different age bins.
+
 ```{r hyperparameters}
 alpha <- c(250,400,120,20)
 trials <- 10000
@@ -562,13 +569,13 @@ ggplot(ds, aes(color = theta, fill = theta, x = theta, y = word)) + geom_boxplot
   scale_color_discrete(guide = FALSE)+ 
   scale_y_continuous(limits = c(0,1))
 ```
-With the thought in mind of initiating a multinomial likelihood distribution with a conjugate Dirichlet prior for a conjugate Dirichlet posterior, we need to determine our hyperparameters for the Dirichlet prior.
+With the thought in mind of initiating a multinomial likelihood distribution and a Dirichlet prior for a conjugate Dirichlet posterior, we need to determine our hyperparameters for the Dirichlet prior.
 Found from the [LDA Inference Book](https://miningthedetails.com/LDA_Inference_Book/multinomial-distribution.html), we once again go back to our prior information of 2009-2013. The age composition of the league seems to have the following variation and means for the four age groups as seen as above.
 
 Thus, we choose our alpha parameter to be a vector of:
 $alpha = (250, 400, 120, 20)$
 
-### Analytical Simulation
+##### Analytical Simulation
 ```{r analytical}
 iter <- 10000
 
@@ -598,7 +605,7 @@ ages_sims_df <- data.frame(
 
 ```
 
-### Posterior
+##### Posterior
 ```{r ridge_posteriors2}
 ages_sims_df$age_bins <- as.factor(ages_sims_df$age_bins)
 
@@ -612,7 +619,7 @@ age_bin_labels <- c("1" = "20-24",
                    "3" = "30-34",
                    "4" = "35+")
 
-p2 <- ggplot(ages_sims_df, aes(x = sims, y = factor(years), fill = age_bins)) +
+p5 <- ggplot(ages_sims_df, aes(x = sims, y = factor(years), fill = age_bins)) +
   geom_density_ridges() +
   scale_fill_manual(values = age_bin_colors, labels = age_bin_labels) + 
   guides(fill = guide_legend(title = "Age")) +
@@ -627,10 +634,32 @@ p2 <- ggplot(ages_sims_df, aes(x = sims, y = factor(years), fill = age_bins)) +
   ylab("Year") +
   scale_y_discrete(limits=rev)
 
-print(p2)
+print(p5)
 ```
 
-From our ridge posterior graph, we can see that the ages of older players actually remain relatively the same throughout the last 10 seasons of the NFL. Meanwhile, the shift occurs from players in their 20's. in the mid 2010s there was a change where there was a noticeable chunk of new talent acquisition into the league, but over the last few years of the 2020s, these players have gotten older and moved into the 25-29 year old range. 
+From our ridge posterior graph, we can see that the ages of older players actually remain relatively the same throughout the last 10 seasons of the NFL. Meanwhile, the shift occurs from players in their 20's. In the mid 2010s there was a change where there was a noticeable chunk of new talent acquisition into the league, but over the last few years of the 2020s, these players have gotten older and moved into the 25-29 year old range. 
+
+
+##### Discussion Part 2
+
+Witnessing the slight variation of newer players into the league around the 2017-2020 time period, it draws and interesting comparison to our previous posterior plot... 
+
+```{r plot_comparison1}
+plot_grid(p2, p5)
+```
+
+
+These plots share an interesting trend:
+from 2017 to 2019, there appears to be a slight shift towards younger athlete's entering the league. After the major shift from 2016 in injury rate, posteriors begin to regress back toward the prior slightly, before moving away again in 2020, around the time those one newer players have entered a new age bracket and there's a greater proportion of 25-29 year-olds in the league.
+
+This could signify that new players in the NFL struggle with the physicality of the game and were responsible for some deviation of the league injury rate. Another theory could be that athletes are just becoming too explosive for their own good at too young of an age. Next, I would like to dive into the percentage of different age groups that have gotten hurt out of the available players in those groups each year. 
+
+
+#### Which Age Bin is Most Likely to be Injured?
+
+With that comparison of our two posteriors, let's try to model something new. We are now interested in which types of players are getting hurt the most relative to the other players that are their age?
+
+##### Some More Data Cleaning
 ```{r}
 players_age2 <- data.frame(
   year = c(2009:2023),
@@ -654,6 +683,22 @@ players_age2
 
 ```
 
+##### Prior and Hyperparameters
+
+Similarly to our first bayesian model that looked to create distributions to model the percentage of players getting hurt out of all players available, it seems logical to use the same framework of a model for each individual age bin. This answers the question: what percentage of athletes get hurt compared to their respective age.
+
+We will use a beta conjugate model once again with a binomial likelihood -- this time analytically.
+
+Similar to our methodology for determining hyperparameters $alpha$ and $beta$ earlier, we used the same empirical technique. 
+
+```{r multiple_beta_posteriors}
+plot_grid(plot_beta(10, 6), plot_beta(15, 40), plot_beta(8, 40), plot_beta(5,50))
+```
+
+These beta distributions model the prior known information of percent likelihood for a player to be injured amongst their age peers.
+
+
+##### Analytical Posterior
 ```{r beta_posterior}
 alpha = c(10, 15, 8, 5)
 beta = c(6, 40, 40, 50)
@@ -675,7 +720,8 @@ age_sims_hurt_df <- data.frame(
 )
 ```
 
-```{r}
+##### Results and Discussion
+```{r age_pct_injuries}
 age_sims_hurt_df$age_bins <- as.factor(age_sims_hurt_df$age_bins)
 
 age_bin_colors <- c("1" = "yellow",
@@ -688,7 +734,7 @@ age_bin_labels <- c("1" = "20-24",
                    "3" = "30-34",
                    "4" = "35+")
 
-p3 <- ggplot(age_sims_hurt_df, aes(x = sims, y = factor(years), fill = age_bins)) +
+p6 <- ggplot(age_sims_hurt_df, aes(x = sims, y = factor(years), fill = age_bins)) +
   geom_density_ridges() +
   scale_fill_manual(values = age_bin_colors, labels = age_bin_labels) + 
   guides(fill = guide_legend(title = "Age")) +
@@ -703,25 +749,60 @@ p3 <- ggplot(age_sims_hurt_df, aes(x = sims, y = factor(years), fill = age_bins)
   ylab("Year") +
   scale_y_discrete(limits=rev)
 
-print(p3)
+print(p6)
 ```
 
 
-### Discussion Part2: Putting It All Together
-```{r align_plots}
-plot_grid(p1, p2)
+Finally, we have plotted the percent chance distributions of a player to be hurt if they fall into a specific age range. It's easy to recognize that the variagion of 35+ has not changed much, 25-34 year olds have actually been better at staying healthy, but surprisingly, the young players appear to be the ones getting hurt with high incidence.
+
+This is very interesting as it is the opposite of our initial hypothesis that the old guys were staying too long and responsible for a higher rate than what should be. Meanwhile, the 20-24 year-olds straight out of college have completely differentiated themselves as the injury-prone group. What's to blame for this differentiation? It's hard to say. Perhaps they aren't used to the physicality of the vicious new game. Maybe they are being trained too early nowadays and are too explosive for their own good? Sports science could be a complete load of you know what. Or maybe it's possible that organizations are purposefully trying to load-manage their younger players to keep them more durable over the long run.
+
+
+## Final Discussion: Accumulation of Parts -- What Does It All Mean?
+
+From our initial posterior plot, 
+
+```{r plot_2}
+print(p2)
 ```
 
-I think there is an interesting comparison to be made between our two posterior distributions:
-from 2017 to 2019, there appears to be a slight shift towards younger athlete's entering the league. After the major shift from 2016 in injury rate, posteriors begin to regress back toward the prior slightly, before moving away again in 2020, around the time those one newer players have entered a new age bracket and there's a greater proportion of 25-29 year-olds in the league.
+we were able to distinguish that some factors within the NFL have led to a decreased injury rate in the last ten years. Whether it had to do with
 
-This could signify that new players in the NFL struggle with the physicality of the game and were responsible for some deviation of the league injury rate. At the same time; however, there has been an undeniable shift from the previous years of the league in terms of overall injury rate. While it's not entirely clear what would happen if we took a league of complete rookies, it is clear that there are some other factors at play for predicting the percentage of players being injured each year -- with theory being based on rules. 
+* Theorized rule changes
+* Shift in officiating flexibility
+* Possible Other Factors
+
+we were unsure.
+
+When compared to the proportion of different age groups in the NFL over the years, we noticed a slight deviation around some periods of regression of younger players entering the league: 
+```{r plot_comparison2}
+plot_grid(p2, p5)
+```
 
 
+With this shifting of different aged players, we decided to look into the ratio of players that became injured compared to others in their age range. 
+
+```{r plot_6}
+print(p6)
+```
+
+And what we noticed is that there was a massive divergence in injuries from those under the age of 25 compared to all other athletes. 
 
 
+```{r plot_comparison3}
+plot_grid(p2, p6)
+```
 
+When we compare these findings with the percentage of players getting injured through the entire league however, just because younger players have been getting hurt more doesn't correlate to the league's injury rate also spiking. Instead, the decreased rate of injury for those over 25 years of age has caused the distributions to remain relatively stable for the past (roughly) 7 seasons. 
 
+This finding takes away from the idea that the demographic of players is a main contributing factor for the entire league's rate of injury. Instead, I believe the next question to be asked is how to prevent younger players from getting hurt as much. Some ideas mentioned earlier include
 
+* Changing training regimens for athletes at a young age (avoiding over-development early)
+* Reexamining human physiological literature for athletes
+* Stabilizing load management rates to express athletes to increase strain if they are being under stimulated
+* etc.
 
+That being said, it's clear that some change occurred in the 2016 season to have significantly decreased injury percentage amongst players. While it can't be definitevly claimed that rule changes are responsible, we analyzed age as a factor instead and found it to be inconclusive for explaining much of the change in distribution of league injuries over time.
 
+## Conclusion
+As the league continues to develop, strong evidence has been provided that some factors, perhaps rule changes, have positively impacted the injury rate amongst NFL athletes. While exploring potential factors for this finding, it was discovered that there has been an alarmingly large spike of young athlete injuries around the league as the game progresses. Determining the cause of these detriments to all players, especially those being most afflicted is extremely important in further reasearch and analyses to helping maintain health and wellness so that us fanatics can continue to watch our favorite teams and players on Sunday (or Monday... or Thursday).
