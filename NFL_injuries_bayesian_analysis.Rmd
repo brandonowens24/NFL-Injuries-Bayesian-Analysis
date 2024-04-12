@@ -105,7 +105,7 @@ When it comes to what classifies as an injury, players on the depth chart that h
 Obviously many of these injuries will come from practice, where players are trying to be careful, but that is something we cannot account for. In other words, it is impossible to see if a player sustains an injury in practice or in the game unless every news source is tracked and maintained for player status. Thus, we assume that players sustaining injuries in practice is just a natural part of the game that will maintain some level of normal variation from season to season. 
 
 
-```{r view_df}
+```{r view_df1}
 df
 ```
 ### EDA:
@@ -422,7 +422,7 @@ dfage <- dfallage %>% filter(year %in% (2014:2023))
 We needed to separate ages into different bins and the number of those players that were injured into their own columns so we could have a metric for each year.
 
 
-```{r view_df}
+```{r view_df2}
 dfage
 ```
 As mentioned earlier, we have some definite data loss primarily in:
