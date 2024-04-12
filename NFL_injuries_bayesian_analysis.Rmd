@@ -41,6 +41,9 @@ library(bayesrules)
 library(ggridges)
 library(ggplot2)
 library(tidyr)
+library(lubridate)
+library(BayesFactor)
+library(cowplot)
 ```
 
 ## Read In Data
@@ -68,10 +71,11 @@ For this Bayesian Analysis, we are interested in gauging the percentage of playe
 
 are not included -- as they have a much less likely chance of getting hurt if they aren't actually playing. 
 
-### Form Dataframe with Desired Values
+## Part 1: Injury Rates
+#### Form Dataframe with Desired Values
 ```{r per_szn}
-player_counts <- numeric(length = 10) 
-injury_counts <- numeric(length = 10)
+player_counts <- numeric(length = 15) 
+injury_counts <- numeric(length = 15)
 
 for (i in 1:15) {
   year <- 2008 + i
@@ -104,11 +108,27 @@ Obviously many of these injuries will come from practice, where players are tryi
 ```{r view_df}
 df
 ```
+### EDA:
+
+```{r visualizations}
+ggplot(data = df, aes(x = as.factor(year))) +
+  geom_bar(aes(y = number_of_players, fill = "Total Players"), stat = "identity", position = "dodge") +
+  geom_bar(aes(y = distinct_injuries, fill = "Total Players Injured"), stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("Total Players" = "blue", "Total Players Injured" = "red"), name="Legend") +
+  ggtitle("Injury Ratio per Season") +
+  xlab("Season") + ylab("Count") +
+  theme(
+    plot.title = element_text(face="bold"),
+    axis.title.x = element_text(face="bold"),
+    axis.title.y = element_text(face="bold")
+  )
+  
+```
+I wanted to get a graphical representation of what the data looked like here. It seems that although the number of players being used in the league (blue) is increasing through the years (slightly, now), there seems to be more uniformity with the total players that were injured.
 
 
-
-## Model Choice:
-### Hyperparameter Choice
+### Model Choice:
+#### Hyperparameter Choice
 ```{r choosing_hyper_params}
 plot_beta(125,245)
 ```
@@ -119,7 +139,7 @@ According to the [Bayes Rules!](https://www.bayesrulesbook.com/chapter-3) by Ali
 
 As our hyper parameters for our prior beta distribution.
 
-### Posterior
+#### Posterior
 ```{r hier}
 iter <- 10000
 n = df$number_of_players
@@ -149,7 +169,7 @@ Our model looks like this:
 Where we could simply use an analytical format, but for added variance and attempting to learn more about simulation methods -- we opt for Gibbs Sampling!
 
 
-### Convergence?
+#### Convergence?
 ```{r convergence_test}
 Gibbs1=as.mcmc(theta[,1])
 Gibbs2=as.mcmc(theta[,2])
@@ -247,9 +267,9 @@ melted_df$value <- as.numeric(melted_df$value)
 ```
 
 
-## Plots and Discussion
+### Plots and Discussion
 ```{r plots}
-ggplot(melted_df, aes(x = value, y = year, group=year, fill=year)) +
+p1 <- ggplot(melted_df, aes(x = value, y = year, group=year, fill=year)) +
   geom_rect(aes(xmin=lower_ci,xmax=higher_ci,ymin=0,ymax=Inf),fill="grey",alpha=.2) +
     geom_density_ridges() +
   geom_vline(xintercept=c(lower_ci, middle_ci, higher_ci),
@@ -269,9 +289,11 @@ ggplot(melted_df, aes(x = value, y = year, group=year, fill=year)) +
     label = "Prior 95% CI", angle=90
   )
 
+print(p1)
 ```
 
-## Discussion
+
+### Discussion Part 1
 
 Some of the major rule changes that may explain the posteriors are as follows (from [NFL.com](https://www.nfl.com/playerhealthandsafety/equipment-and-innovation/rules-changes/nfl-health-and-safety-related-rules-changes-since-2002)):
 
@@ -301,10 +323,10 @@ Some of the major rule changes that may explain the posteriors are as follows (f
   * Fair catch goes to team's 25 yard line hoping for more instances of fair catches.
   * Expands Impermissible Use of the helmet calls.
   
-The most massive of the posterior distribution shifts comes in 2016, where previously the distributions greatly reflected the prior. With this large shift, it is hard to tell if one rule specifically caused the change, both rules together did, or with the new rules, there was a crackdown on officiating. Regardless, the previous four seasons have completely remained outside of our Prior distributions 95% confidence interval, signifying changes for the better when it comes to new rules and officiating! Next season will see updates to the entire format of the kickoff play and the swivel hip-drop tackle -- two instances of the game highly scrutinized for being dangerous... but also causing controversy with how difficult it will now be to tackle quarterbacks and larger players from behind.
+The most massive of the posterior distribution shifts comes in 2016, where previously the distributions greatly reflected the prior. With this large shift, it is hard to tell if one rule specifically caused the change, both rules together did, or with the new rules, there was a crackdown on officiating. Regardless, the previous four seasons have completely remained outside of our Prior distributions 95% confidence interval, signifying changes for the better when it comes to new rules and officiating! Perhaps this isn't crystal clear, but I believe that as long as some sort of change is occurring to prove injury rates are declining YoY, then it doesn't matter if it is the specific rule change or a change of referee rigidity. Next season will see updates to the entire format of the kickoff play and the swivel hip-drop tackle -- two instances of the game being highly scrutinized for being dangerous... but also causing controversy with how difficult it will now be to tackle quarterbacks and larger players from behind.
 
 
-## Conclusion
+### Conclusion Part 1
 While there is evidence to demonstrate that the inclusion of these rules is indeed helping to keep athletes safer and dismiss the claims of unruly fans who believe these tweaks are unwarranted, it is unclear if the rule changes are *fully* responsible for the decrease in injury rate. Tightening of officiating is thought to be another major cause although this type of metric is much more difficult to express. This should be explored further.
 
 Additionally, while cleaning the data, I opted to use a binomial model due to ease. The problem with this method lies in one distinct area:
@@ -314,4 +336,392 @@ Additionally, while cleaning the data, I opted to use a binomial model due to ea
   * Players can become injured at any time: even at practices our outside incidences. Thus I didn't account for when and where the players developed their injuries. Therefore, it's assumed that the rule changes help deload stress to players outside of game instances.
 
   
+## Intermission
+
+While analyzing the results from Part 1: Injury Analysis, my professor made some feedback on my project proposal. He mentioned that I could also analyze player durability through age bins within the data. I thought this was a fantastic idea and could possibly provide some insight to my part 1 analysis!
+
+More specifically, what if there's a chance that the new acquisition of skill in the NFL isn't as good as it once was. This would cause the league to have to hold onto older players... 
+
+Older players would most likely infer higher injury rates, as it is commonly studied that older athletes struggle to maintain power, speed, and muscle mass as they age. So as a way to test this theory or the composition of ages in the NFL and see if there's any connection, we dove into some player background data...
+
+
+
+## Part 2: Age Analysis
+### Age Data Cleaning
+
+```{r age, warning=FALSE}
+players$age = ifelse(!is.na(players$birth_date), as.numeric(players$season) - as.numeric(format(as.Date(players$birth_date), "%Y")), players$years_exp + 22)
+
+injury$age <- NA
+
+
+for (i in seq_len(nrow(injury))) {
+  matching_row <- which(players$full_name == injury$full_name[i])
+  
+  if (length(matching_row) > 0) {
+    injury$age[i] <- players$age[matching_row]
+  }
+}
+```
+
+Here we had to make some assumptions to avoid major data loss. If `NFLreadR` didn't include player age from the subset of players we were looking into earlier, I assumed to the player's years of experience in the league + 22 (the average age when an NFL player graduates college to join the league) would suffice as a solid age metric.
+
+
+```{r view_nas}
+injury[is.na(injury$age),]
+players[is.na(players$age),]
+injury[is.na(injury$gsis_id),]
+players[is.na(players$gsis_id),]
+```
+There's some obvious data loss, but not enough to really skew our thousands of rows of information. Because the age loss and id loss is so minimal, we will choose to ignore it.
+
+```{r new_df_age}
+age_bin_20_24 <- numeric(length = 15)
+age_bin_25_29 <- numeric(length = 15)
+age_bin_30_34 <- numeric(length = 15)
+age_bin_35_up <- numeric(length = 15)
+
+age_bin_20_24_hurt <- numeric(length = 15)
+age_bin_25_29_hurt <- numeric(length = 15)
+age_bin_30_34_hurt <- numeric(length = 15)
+age_bin_35_up_hurt <- numeric(length = 15)
+
+for (i in 1:15) {
+  year <- 2008 + i
+  
+  age_bin_20_24[i] <- players %>% filter(season == year, age >= 20, age < 25) %>% nrow()
+  age_bin_25_29[i] <- players %>% filter(season == year, age >= 25, age < 30) %>% nrow()
+  age_bin_30_34[i] <- players %>% filter(season == year, age >= 30, age < 35) %>% nrow()
+  age_bin_35_up[i] <- players %>% filter(season == year, age >= 35) %>% nrow()
+  
+  age_bin_20_24_hurt[i] <- injury %>% filter(season == year, report_status %in% c("Out", "Doubtful", "Questionable"),  age >= 20, age < 25) %>% nrow()
+  age_bin_25_29_hurt[i] <- injury %>% filter(season == year, report_status %in% c("Out", "Doubtful", "Questionable"), age >= 25, age < 30) %>% nrow()
+  age_bin_30_34_hurt[i] <- injury %>% filter(season == year, report_status %in% c("Out", "Doubtful", "Questionable"),  age >= 30, age < 35) %>% nrow()
+  age_bin_35_up_hurt[i] <- injury %>% filter(season == year, report_status %in% c("Out", "Doubtful", "Questionable"), age >= 35) %>% nrow()
+}
+
+dfallage <- data.frame(
+  year = c(2009:2023),
+  number_of_players = player_counts,
+  number_of_players_age_listed = (age_bin_20_24 + age_bin_25_29 + age_bin_30_34 + age_bin_35_up),
+  distinct_injuries = injury_counts,
+  disting_injuries_age_listed = (age_bin_20_24_hurt + age_bin_25_29_hurt + age_bin_30_34_hurt + age_bin_35_up_hurt),
+  prob_inj = injury_counts/player_counts,
+  age_20_24 = age_bin_20_24,
+  age_20_24_hurt = age_bin_20_24_hurt,
+  age_25_29 = age_bin_25_29,
+  age_25_29_hurt = age_bin_25_29_hurt,
+  age_30_34 = age_bin_30_34,
+  age_30_34_hurt = age_bin_30_34_hurt,
+  age_35_up = age_bin_35_up,
+  age_35_up_hurt = age_bin_35_up_hurt
+)
+
+dfage <- dfallage %>% filter(year %in% (2014:2023))
+```
+
+We needed to separate ages into different bins and the number of those players that were injured into their own columns so we could have a metric for each year.
+
+
+```{r view_df}
+dfage
+```
+As mentioned earlier, we have some definite data loss primarily in:
+
+* Injury Age Listed
+
+Luckily, we only are missing about 0-5 values per row for our hundreds of values. Thus, it isn't worth the headache of trying to distinguish the few players left out here and we ignore it as mentioned earlier.
+
+
+### EDA
+
+```{r melt_df}
+melted_df <- dfage %>% 
+  pivot_longer(cols = c(age_20_24, age_25_29, age_30_34, age_35_up)) %>%
+  mutate(name = factor(name, levels = c("age_20_24", "age_25_29", "age_30_34", "age_35_up")))
+
+```
+
+```{r part2_plot1}
+ggplot(data = melted_df, aes(x = as.factor(year), y = value, fill = name)) +
+  geom_bar(stat = "identity", position = "stack") +
+  ggtitle("Logged Player Age Ranges per Season") +
+  xlab("Season") + ylab("Count") +
+  scale_fill_manual(values = c("age_20_24" = "#658eba",
+                                "age_25_29" = "#4f6b9e",
+                                "age_30_34" = "#364575",
+                                "age_35_up" = "#192c40"), name = "Age",
+                    labels= c("20-24",
+                              "25-29",
+                              "30-34",
+                              "35+")) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    axis.title.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold"),
+    legend.title = element_text(face = "bold")
+  )
+```
+
+We comprise the makeup of players with actual logged ages for our years of interest in the league. It seems our original hypothesis may not be as strong as we initially hoped. In other words, we notice:
+
+* The league size is growing.
+* The number of older players is marginally growing.
+* The most growth comes from players considered during their prime years: 25-29 years old. We will look further at this.
+
+
+```{r melt_df2}
+melted_df <- dfage %>% 
+  pivot_longer(cols = c(number_of_players_age_listed, age_20_24_hurt, age_25_29_hurt, age_30_34_hurt, age_35_up_hurt)) %>%
+  mutate(name = factor(name, levels = c("age_20_24_hurt", "age_25_29_hurt", "age_30_34_hurt", "age_35_up_hurt", "number_of_players_age_listed")))
+
+```
+
+
+```{r part2_plot2}
+ggplot(data = melted_df, aes(x = as.factor(year), y = value, fill = name)) +
+  geom_bar(data = filter(melted_df, name == "number_of_players_age_listed"), 
+           aes(x = as.factor(year), y = value, fill = name),
+           stat = "identity", position = "dodge") +
+  geom_bar(data = filter(melted_df, name != "number_of_players_age_listed"), 
+           aes(x = as.factor(year), y = value, fill = name),
+           stat = "identity", position = "stack") +
+  ggtitle("Normalized Injury Ratio per Season by Age") +
+  xlab("Season") + ylab("Count") +
+  scale_fill_manual(values = c("number_of_players_age_listed" = "#ebd42d", 
+                                "age_20_24_hurt" = "#f5bc36",
+                                "age_25_29_hurt" = "#eda54c",
+                                "age_30_34_hurt" = "#f77225",
+                                "age_35_up_hurt" = "red"), name = "Age",
+                    labels= c("Avail. Players",
+                              "20-24",
+                              "25-29",
+                              "30-34",
+                              "35+")) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    axis.title.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold"),
+    legend.title = element_text(face="bold")
+  )
+```
+
+This plot pretty clearly demonstrates that older players actually aren't the ones getting hurt! Who would have thought! Some possible reasons for this finding may be that:
+* There just aren't a lot of older players in the league.
+* Older players may not receive the game frequency or practice volume that younger players receive.
+* A lot of the older players may have more durable position types like punters, kickers, backup quarterbacks, etc.
+
+So maybe age does play a difference, just not in the way that we thought.
+
+### Modelling
+```{r players_age_df}
+players <- players[!is.na(players$age),]
+
+for (i in 1:15) {
+  year <- 2008 + i
+  player_counts[i] <- players %>% filter(season == year) %>% nrow()
+  age_bin_20_24[i] <- players %>% filter(season == year, age >= 20, age < 25) %>% nrow()
+  age_bin_25_29[i] <- players %>% filter(season == year, age >= 25, age < 30) %>% nrow()
+  age_bin_30_34[i] <- players %>% filter(season == year, age >= 30, age < 35) %>% nrow()
+  age_bin_35_up[i] <- players %>% filter(season == year, age >= 35) %>% nrow()
+}
+
+players_age <- players %>%
+  summarize(
+    total = player_counts,
+    a20_24 = age_bin_20_24,
+    a25_29 = age_bin_25_29,
+    a30_34 = age_bin_30_34,
+    a35_up = age_bin_35_up,
+    pct20_24 = age_bin_20_24/player_counts,
+    pct25_29 = age_bin_25_29/player_counts,
+    pct30_34 = age_bin_30_34/player_counts,
+    pct35_up = age_bin_35_up/player_counts,
+  )
+
+```
+
+
+#### Prior and Hyperparameters
+```{r hyperparameters}
+alpha <- c(250,400,120,20)
+trials <- 10000
+x <- rdirichlet(trials, alpha)
+colnames(x) <- c('theta_1', 'theta_2', 'theta_3', 'theta_4')
+ds <- cbind(as_tibble(x), trial = 1:trials) %>% 
+  gather(theta, word, -trial)
+
+ggplot(ds, aes(color = theta, fill = theta, x = theta, y = word)) + geom_boxplot(alpha = 0.3) + 
+  theme_minimal() + 
+  labs(y='\U03B8', x = '', title = paste0("\U03B1 = ",unique(alpha)) ) + 
+  scale_x_discrete(labels = c(expression("\U03B1"[1]),
+                              expression("\U03B1"[2]),
+                              expression("\U03B1"[3]),
+                              expression("\U03B1"))) + 
+  scale_fill_discrete(guide = FALSE) + 
+  scale_color_discrete(guide = FALSE)+ 
+  scale_y_continuous(limits = c(0,1))
+```
+With the thought in mind of initiating a multinomial likelihood distribution with a conjugate Dirichlet prior for a conjugate Dirichlet posterior, we need to determine our hyperparameters for the Dirichlet prior.
+Found from the [LDA Inference Book](https://miningthedetails.com/LDA_Inference_Book/multinomial-distribution.html), we once again go back to our prior information of 2009-2013. The age composition of the league seems to have the following variation and means for the four age groups as seen as above.
+
+Thus, we choose our alpha parameter to be a vector of:
+$alpha = (250, 400, 120, 20)$
+
+### Analytical Simulation
+```{r analytical}
+iter <- 10000
+
+alpha <- c(250,400,120,20)
+n_matrix <- subset(players_age[6:15, 2:5])
+sims <- array(NA, c(iter, length(alpha), nrow(n_matrix)))
+
+for (i in 1:10){
+  sims[, ,i] = rdirichlet(iter, (alpha + n_matrix[i,])) 
+}
+
+```
+
+We draw 10,000 draws for our 4 bins for our 10 seasons.
+
+
+```{r melt_df3}
+years <- rep(2014:2023, each=40000)
+categories <- rep(1:4, each=10000, times=10)
+simulations <- c(sims)
+
+ages_sims_df <- data.frame(
+  years = years,
+  age_bins = categories,
+  sims = simulations
+)
+
+```
+
+### Posterior
+```{r ridge_posteriors2}
+ages_sims_df$age_bins <- as.factor(ages_sims_df$age_bins)
+
+age_bin_colors <- c("1" = "#658eba",
+                   "2" = "#4f6b9e", 
+                   "3" = "#364575",
+                   "4" = "#192c40")
+
+age_bin_labels <- c("1" = "20-24",
+                   "2" = "25-29", 
+                   "3" = "30-34",
+                   "4" = "35+")
+
+p2 <- ggplot(ages_sims_df, aes(x = sims, y = factor(years), fill = age_bins)) +
+  geom_density_ridges() +
+  scale_fill_manual(values = age_bin_colors, labels = age_bin_labels) + 
+  guides(fill = guide_legend(title = "Age")) +
+  theme(
+    axis.title = element_text(face = "bold"),
+    axis.text = element_text(face = "bold"),
+    plot.title = element_text(face = "bold"),
+    legend.title = element_text(face = "bold")
+  ) +
+  ggtitle("Player Age Pct Composition in the NFL") +
+  xlab("Theta (Pct. Makeup of Players)") +
+  ylab("Year") +
+  scale_y_discrete(limits=rev)
+
+print(p2)
+```
+
+From our ridge posterior graph, we can see that the ages of older players actually remain relatively the same throughout the last 10 seasons of the NFL. Meanwhile, the shift occurs from players in their 20's. in the mid 2010s there was a change where there was a noticeable chunk of new talent acquisition into the league, but over the last few years of the 2020s, these players have gotten older and moved into the 25-29 year old range. 
+```{r}
+players_age2 <- data.frame(
+  year = c(2009:2023),
+  t2024 = age_bin_20_24,
+  t2529 = age_bin_25_29,
+  t3034 = age_bin_30_34,
+  t35p = age_bin_35_up,
+  th2024 = age_bin_20_24_hurt,
+  th2529 = age_bin_25_29_hurt,
+  th3034 = age_bin_30_34_hurt,
+  th35p = age_bin_35_up_hurt,
+  tp2024 = age_bin_20_24_hurt / age_bin_20_24,
+  tp2529 = age_bin_25_29_hurt / age_bin_25_29,
+  tp3034 = age_bin_30_34_hurt / age_bin_30_34,
+  tp35p = age_bin_35_up_hurt / age_bin_35_up
+)
+```
+
+```{r}
+players_age2
+
+```
+
+```{r beta_posterior}
+alpha = c(10, 15, 8, 5)
+beta = c(6, 40, 40, 50)
+
+for (i in 1:10){
+  for (j in 1:iter){
+    sims[j, ,i] <- rbeta(4, alpha + (as.numeric(players_age2[i, 6:9])), beta + (as.numeric(players_age2[i, 2:5]) - as.numeric(players_age2[i,6:9])))
+}}
+
+
+years <- rep(2014:2023, each=40000)
+categories <- rep(1:4, each=10000, times=10)
+simulations <- c(sims)
+
+age_sims_hurt_df <- data.frame(
+  years = years,
+  age_bins = categories,
+  sims = simulations
+)
+```
+
+```{r}
+age_sims_hurt_df$age_bins <- as.factor(age_sims_hurt_df$age_bins)
+
+age_bin_colors <- c("1" = "yellow",
+                   "2" = "#eda54c", 
+                   "3" = "#f77225",
+                   "4" = "red")
+
+age_bin_labels <- c("1" = "20-24",
+                   "2" = "25-29", 
+                   "3" = "30-34",
+                   "4" = "35+")
+
+p3 <- ggplot(age_sims_hurt_df, aes(x = sims, y = factor(years), fill = age_bins)) +
+  geom_density_ridges() +
+  scale_fill_manual(values = age_bin_colors, labels = age_bin_labels) + 
+  guides(fill = guide_legend(title = "Age")) +
+  theme(
+    axis.title = element_text(face = "bold"),
+    axis.text = element_text(face = "bold"),
+    plot.title = element_text(face = "bold"),
+    legend.title = element_text(face = "bold")
+  ) +
+  ggtitle("Player Age Pct Composition in the NFL") +
+  xlab("Theta (Pct. of Players Hurt in Age Bracket)") +
+  ylab("Year") +
+  scale_y_discrete(limits=rev)
+
+print(p3)
+```
+
+
+### Discussion Part2: Putting It All Together
+```{r align_plots}
+plot_grid(p1, p2)
+```
+
+I think there is an interesting comparison to be made between our two posterior distributions:
+from 2017 to 2019, there appears to be a slight shift towards younger athlete's entering the league. After the major shift from 2016 in injury rate, posteriors begin to regress back toward the prior slightly, before moving away again in 2020, around the time those one newer players have entered a new age bracket and there's a greater proportion of 25-29 year-olds in the league.
+
+This could signify that new players in the NFL struggle with the physicality of the game and were responsible for some deviation of the league injury rate. At the same time; however, there has been an undeniable shift from the previous years of the league in terms of overall injury rate. While it's not entirely clear what would happen if we took a league of complete rookies, it is clear that there are some other factors at play for predicting the percentage of players being injured each year -- with theory being based on rules. 
+
+
+
+
+
+
+
+
 
