@@ -15,21 +15,21 @@ The NFL is valued as a $163B organization where athletes compete for a total of 
 * Athlete Well-Being:
   * The physical and mental health of human beings is important.
   * Injuries impact an athlete's ability to live during and after their careers.
-  * New research is demonstrating the tragic significance of once unforseen traumas, like concussions.
+  * New research is demonstrating the tragic significance of once unforeseen traumas, like concussions.
   
 * Organizational Cost:
-  * When star players that fandoms are build around are injured, this devaules the product that the NFL sells.
+  * When star players that fandoms are built around are injured, this devalues the product that the NFL sells.
   * Organizations want players to be hurt to maintain fan interest and to not shell out "guaranteed" money for player contracts when those players aren't participating.
   
 With that being said, the NFL has instated over 50 rule changes to reduce player danger since 2002 alone.
 
 
 ## What Are We Looking At?
-Have these significant rule changes that have caused controversy really impacted the athlete's for the better? Many fans believe that the league is taking the fun out of the game by limiting exciting plays through hits, collissions, and game-officiating. Thus, are the rule changes actually helping to reduce injuries amongst athletes? That's what we are interested in.
+Have these significant rule changes that have caused controversy really impacted the athlete's for the better? Many fans believe that the league is taking the fun out of the game by limiting exciting plays through hits, collisions, and game-officiating. Thus, are the rule changes actually helping to reduce injuries amongst athletes? That's what we are interested in.
 
-Drawing on information from 2009-2013, we use this prior knowledge to inform a binomial likelihood of the number of players that get hurt in a season compared to all players in the National Football League. This allows us to form beta posterior distributions of what we can confidently predict the percentage of players we'd have expected to have gotten hurt from the 2014-2023 seasons. We are interested in analyzing **if protocols set by the NFL to reduce player injury are successful or not over the last 10 years**.
+Drawing on information from 2009-2013, we use this prior knowledge to inform a binomial likelihood of the number of players that get hurt in a season compared to all players in the National Football League. This allows us to form beta posterior distributions of what we can confidently predict the percentage of players we'd have expected to have gotten hurt from the 2014-2023 seasons. My analysis then delves into a Dirichlet conjugate posterior to analyze the influx of different age groups into the NFL. It ends with another beta conjugate model assessing the percentage of players that are getting injured between the categorical age groups. Thus, we are interested in analyzing **if protocols set by the NFL to reduce player injury are successful or not over the last 10 years** and compare this question to other factors, like age..
 
-
+### General Setup
 #### Install Necessary Packages
 ```{r Load_Libraries}
 library(dplyr)
@@ -46,7 +46,6 @@ library(BayesFactor)
 library(cowplot)
 ```
 
-## Read In Data
 #### Retrieve Players of Interest
 ```{r load_pbp}
 injury <- nflreadr::load_injuries(2009:2023)
@@ -71,7 +70,7 @@ For this Bayesian Analysis, we are interested in gauging the percentage of playe
 
 are not included -- as they have a much less likely chance of getting hurt if they aren't actually playing. 
 
-## Part 1: Injury Rates
+## Part 1: Injury Rates in General
 #### Form Dataframe with Desired Values
 ```{r per_szn}
 player_counts <- numeric(length = 15) 
@@ -124,10 +123,13 @@ p1 <- ggplot(data = df, aes(x = as.factor(year))) +
   
 print(p1)
 ```
+
 I wanted to get a graphical representation of what the data looked like here. It seems that although the number of players being used in the league (blue) is increasing through the years (slightly, now), there seems to be more uniformity with the total players that were injured.
 
 
 ### Model Choice:
+As mentioned in the background, we are opting for a binomial likelihood to approximate the number of players getting hurt out of the total number of players for the last ten seasons of the NFL. Utilizing a beta prior allows us the ease of manipulating a beta-conjugate posterior to obtain distributions of the percentage of all players that get hurt in the league for the last ten seasons.
+
 #### Hyperparameter Choice
 ```{r choosing_hyper_params}
 plot_beta(125,245)
@@ -139,7 +141,7 @@ According to the [Bayes Rules!](https://www.bayesrulesbook.com/chapter-3) by Ali
 
 As our hyper parameters for our prior beta distribution.
 
-#### Posterior
+#### Posterior: Beta-Conjugate
 ```{r hier}
 iter <- 10000
 n = df$number_of_players
@@ -346,8 +348,8 @@ Older players theoretically should elicit higher injury rates, as it is commonly
 
 
 ## Part 2: Age Analysis
-#### Age Data Cleaning
 
+#### Age Data Cleaning
 ```{r age, warning=FALSE}
 players$age = ifelse(!is.na(players$birth_date), as.numeric(players$season) - as.numeric(format(as.Date(players$birth_date), "%Y")), players$years_exp + 22)
 
@@ -512,7 +514,7 @@ print(p4)
 This plot pretty clearly demonstrates that older players actually aren't the ones getting hurt! Who would have thought! Some possible reasons for this finding may be that:
 * There just aren't a lot of older players in the league.
 * Older players may not receive the game frequency or practice volume that younger players receive.
-* A lot of the older players may have more durable position types like punters, kickers, backup quarterbacks, etc.
+* A lot of the older players may have more durable position types that allow them to avoid contact situations, like punters, kickers, backup quarterbacks, etc.
 
 So maybe age does play a difference, just not in the way that we thought.
 
@@ -575,7 +577,7 @@ Found from the [LDA Inference Book](https://miningthedetails.com/LDA_Inference_B
 Thus, we choose our alpha parameter to be a vector of:
 $alpha = (250, 400, 120, 20)$
 
-##### Analytical Simulation
+##### Analytical Simulation of Posterior: Dirichlet
 ```{r analytical}
 iter <- 10000
 
@@ -605,7 +607,7 @@ ages_sims_df <- data.frame(
 
 ```
 
-##### Posterior
+#### Plotting 
 ```{r ridge_posteriors2}
 ages_sims_df$age_bins <- as.factor(ages_sims_df$age_bins)
 
@@ -805,4 +807,4 @@ This finding takes away from the idea that the demographic of players is a main 
 That being said, it's clear that some change occurred in the 2016 season to have significantly decreased injury percentage amongst players. While it can't be definitevly claimed that rule changes are responsible, we analyzed age as a factor instead and found it to be inconclusive for explaining much of the change in distribution of league injuries over time.
 
 ## Conclusion
-As the league continues to develop, strong evidence has been provided that some factors, perhaps rule changes, have positively impacted the injury rate amongst NFL athletes. While exploring potential factors for this finding, it was discovered that there has been an alarmingly large spike of young athlete injuries around the league as the game progresses. Determining the cause of these detriments to all players, especially those being most afflicted is extremely important in further reasearch and analyses to helping maintain health and wellness so that us fanatics can continue to watch our favorite teams and players on Sunday (or Monday... or Thursday).
+As the league continues to develop, strong evidence has been provided that some factors, perhaps rule changes, have positively impacted the injury rate among NFL athletes. While exploring potential factors for this finding, it was discovered that there has been an alarmingly large spike of young athlete injuries around the league as the game progresses. Determining the cause of these detriments to all players, especially those being most afflicted is extremely important in further research and analyses to help maintain health and wellness so that us fanatics can continue to watch our favorite teams and players on Sunday (or Monday... or Thursday).
