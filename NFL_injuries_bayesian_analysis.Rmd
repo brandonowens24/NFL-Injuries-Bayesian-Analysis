@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Background
-The NFL is valued as a $163B organization where athletes compete for a total of 21-24 games during the season (3 preseason, 17 in-season, 1-4 post-season games). A major complaint of fans over the last couple of years has surrounded the significance of injuries on the sport in several ways:
+The NFL is valued as a $163B organization where athletes compete for a total of 20-24 games during the season (3 preseason, 17 in-season, 0-4 post-season games). A major complaint of fans over the last couple of years has surrounded the significance of injuries on the sport in several ways:
 
 * Athlete Well-Being:
   * The physical and mental health of human beings is important.
@@ -25,9 +25,14 @@ With that being said, the NFL has instated over 50 rule changes to reduce player
 
 
 ## What Are We Looking At?
-Have these significant rule changes that have caused controversy really impacted the athlete's for the better? Many fans believe that the league is taking the fun out of the game by limiting exciting plays through hits, collisions, and game-officiating. Thus, are the rule changes actually helping to reduce injuries amongst athletes? That's what we are interested in.
+Have these significant rule changes that have caused controversy really impacted the athlete's for the better? Many fans believe that the league is taking the fun out of the game by limiting the violent and aggressive nature of the sport. Thus, fan dichotomy has ensued surrounding the question of if these changes are really for the better?
 
-Drawing on information from 2009-2013, we use this prior knowledge to inform a binomial likelihood of the number of players that get hurt in a season compared to all players in the National Football League. This allows us to form beta posterior distributions of what we can confidently predict the percentage of players we'd have expected to have gotten hurt from the 2014-2023 seasons. My analysis then delves into a Dirichlet conjugate posterior to analyze the influx of different age groups into the NFL. It ends with another beta conjugate model assessing the percentage of players that are getting injured between the categorical age groups. Thus, we are interested in analyzing **if protocols set by the NFL to reduce player injury are successful or not over the last 10 years** and compare this question to other factors, like age..
+Drawing on information from 2009-2013, we use this prior knowledge to inform three different distributions.
+* Beta Conjugate Model: To assess if the injury rate among players has declined over the last 10 seasons.
+* Dirichlet Conjugate Model: To assess the participation among age groups that comprise the NFL over the last 10 seasons.
+* Beta Conjuage Model: To assess the injury rate of players falling into a specific age rage amongst their peers in this age bin to gain insight on if age is a factor toward the injury rate.
+
+Thus, we are interested in analyzing **if protocols set by the NFL to reduce player injury are successful or not over the last 10 years** and compare this question to other factors, like age.
 
 ### General Setup
 #### Install Necessary Packages
@@ -124,10 +129,10 @@ p1 <- ggplot(data = df, aes(x = as.factor(year))) +
 print(p1)
 ```
 
-I wanted to get a graphical representation of what the data looked like here. It seems that although the number of players being used in the league (blue) is increasing through the years (slightly, now), there seems to be more uniformity with the total players that were injured.
+I wanted to get a graphical representation of what the data looked like here. It seems that although the number of players being used in the league (blue) is increasing through the years (slightly, now), there seems to be more uniformity with the total players that were injured (red).
 
 
-### Model Choice:
+### Model Choice: Beta Conjugate
 As mentioned in the background, we are opting for a binomial likelihood to approximate the number of players getting hurt out of the total number of players for the last ten seasons of the NFL. Utilizing a beta prior allows us the ease of manipulating a beta-conjugate posterior to obtain distributions of the percentage of all players that get hurt in the league for the last ten seasons.
 
 #### Hyperparameter Choice
@@ -545,9 +550,9 @@ players_age <- players %>%
 
 ```
 
-### Modelling
+### Modelling: Dirichlet Conjugate
 
-#### Which Age Bin Dominates the League?
+#### Which Age Bin Dominates the League? (Dirichlet Conjugate)
 ##### Prior and Hyperparameters
 
 It seems logical to start with some modelling to see how the composition of ages in the league has changed over time. With this, a multinomial likelihood model (with Dirichlet conjugacy for ease) seems like the appropriate route to estimate the percent compositions of these different age bins.
@@ -661,6 +666,8 @@ This could signify that new players in the NFL struggle with the physicality of 
 
 With that comparison of our two posteriors, let's try to model something new. We are now interested in which types of players are getting hurt the most relative to the other players that are their age?
 
+#### Which Ages Are Getting Hurt the Most?
+
 ##### Some More Data Cleaning
 ```{r}
 players_age2 <- data.frame(
@@ -755,7 +762,7 @@ print(p6)
 ```
 
 
-Finally, we have plotted the percent chance distributions of a player to be hurt if they fall into a specific age range. It's easy to recognize that the variagion of 35+ has not changed much, 25-34 year olds have actually been better at staying healthy, but surprisingly, the young players appear to be the ones getting hurt with high incidence.
+Finally, we have plotted the percent chance distributions of a player to be hurt if they fall into a specific age range. It's easy to recognize that the variation of 35+ has not changed much, 25-34 year olds have actually been better at staying healthy, but surprisingly, the young players appear to be the ones getting hurt with high incidence.
 
 This is very interesting as it is the opposite of our initial hypothesis that the old guys were staying too long and responsible for a higher rate than what should be. Meanwhile, the 20-24 year-olds straight out of college have completely differentiated themselves as the injury-prone group. What's to blame for this differentiation? It's hard to say. Perhaps they aren't used to the physicality of the vicious new game. Maybe they are being trained too early nowadays and are too explosive for their own good? Sports science could be a complete load of you know what. Or maybe it's possible that organizations are purposefully trying to load-manage their younger players to keep them more durable over the long run.
 
@@ -802,9 +809,11 @@ This finding takes away from the idea that the demographic of players is a main 
 * Changing training regimens for athletes at a young age (avoiding over-development early)
 * Reexamining human physiological literature for athletes
 * Stabilizing load management rates to express athletes to increase strain if they are being under stimulated
-* etc.
+* Getting young players more prepared for the physicality of the professional game
 
-That being said, it's clear that some change occurred in the 2016 season to have significantly decreased injury percentage amongst players. While it can't be definitevly claimed that rule changes are responsible, we analyzed age as a factor instead and found it to be inconclusive for explaining much of the change in distribution of league injuries over time.
+That being said, it's clear that some change occurred in the 2016 season to have significantly decreased injury percentage among players. While it can't be definitevly claimed that rule changes are responsible, we analyzed age as a factor instead and found it to be inconclusive for explaining much of the change in distribution of league injuries over time.
+
+Instead, further analysis should be conducted on the usage of players under the age of 25 to examine if that is the reason why they are being hurt so frequently, or if there is a separate reason. 
 
 ## Conclusion
-As the league continues to develop, strong evidence has been provided that some factors, perhaps rule changes, have positively impacted the injury rate among NFL athletes. While exploring potential factors for this finding, it was discovered that there has been an alarmingly large spike of young athlete injuries around the league as the game progresses. Determining the cause of these detriments to all players, especially those being most afflicted is extremely important in further research and analyses to help maintain health and wellness so that us fanatics can continue to watch our favorite teams and players on Sunday (or Monday... or Thursday).
+As the league continues to develop, strong evidence has been provided that some factors, perhaps rule changes, have positively impacted the injury rate among NFL athletes. While exploring potential factors for this finding, it was discovered that there has been an alarmingly large spike of young athlete injuries around the league as the game progresses. Determining the cause of these detriments to all players, especially those being most afflicted is extremely important in further research and analyses to help maintain player health and wellness. Future areas of exploration should evaluate player usage rates based on age help better distinguish what is impacting the NFL's injury rate. These studies can help to keep players safer so that they can live happier, healthier lives and us fanatics can continue to watch our favorite teams and players on Sunday (or Monday... or Thursday).
