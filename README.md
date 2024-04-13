@@ -42,7 +42,8 @@ What is clear from these findings is that if the NFL would like to continue thei
 ## Files and Folders
 * [images](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/tree/main/images) Contains relevant images for readme and notebook explanations.
 * [Notebook](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/blob/main/NFL_injuries_bayesian_analysis.Rmd) Contains full analysis and breakdown of the problem with executable code!
-* [Notebook html](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/blob/main/NFL_injury_bayesian_analysis.html) Contains raw html file.
+* [Notebook.html](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/blob/main/NFL_injury_bayesian_analysis.html) Contains raw html file.
+* [NFL_Injuries_Bayesian_slides.pdf](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/blob/main/NFL_Injury_Bayesian_slides.pdf) Contains presentation slides.
 
 ## About
 Author: Brandon Owens <br></br>
