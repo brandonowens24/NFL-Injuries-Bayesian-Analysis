@@ -1,7 +1,7 @@
-# A Bayesian Analysis on NFL Injuries
+# A Bayesian Analysis on NFL Injuries: 
 
 ## Background
-The NFL is valued as a $163B organization where athletes compete for a total of 21-24 games during the season (3 preseason, 17 in-season, 1-4 post-season games). A major complaint of fans over the last couple of years has surrounded the significance of injuries on the sport in several ways:
+The NFL is valued as a $163B organization where athletes compete for a total of 20-24 games during the season (3 preseason, 17 in-season, 0-4 post-season games). A major complaint of fans over the last couple of years has surrounded the significance of injuries on the sport in several ways:
 
 * Athlete Well-Being:
   * The physical and mental health of human beings is important.
@@ -17,18 +17,16 @@ With that being said, the NFL has instated over 50 rule changes to reduce player
 ![Injury Image](./images/injury_kneeling.jpg)
 
 ## What Are We Looking At?
-Have these significant rule changes that have caused controversy really impacted the athlete's for the better? Many fans believe that the league is taking the fun out of the game by limiting exciting plays through hits, collissions, and game-officiating. Thus, are the rule changes actually helping to reduce injuries amongst athletes? That's what we are interested in.
-
-Drawing on information from 2009-2013, we use this prior knowledge to inform a multiple models (beta congjugate, dirichlet conjugate, and another beta conjugate model) to gain insight on **whether protocols set by the NFL to reduce player injury are successful or not over the last 10 years**.
+Many of these rule changes have caused significant controversy over the last handful of seasons (just check Twitter). With this divide, many fans believe that the league is taking the fun out of the game by limiting exciting plays through the elimination of violence and contact. Using prior information from the 2009-2013 seasons, we inform multiple models (beta congjugate, dirichlet conjugate, and another beta conjugate model) to gain insight on **whether protocols set by the NFL to reduce player injury are successful or not over the last 10 years**.
 
 ## Findings
 ![Posterior Distributions](./images/ridge_posteriors.png)
 
-Utilizing a Beta Conjugate Posterior model, the most massive of the posterior distribution shift comes in 2016, where previously the distributions greatly reflected the prior. With this large shift, it is hard to tell if one rule specifically caused the change, both rules together did, or with the new rules, there was a crackdown on officiating. This change could also have been caused by unforseen factors, like age.
+Utilizing a Beta Conjugate Posterior model, the most massive of the posterior distribution shifts comes in 2016, where previously the distributions greatly reflected the prior. With this large shift, it is hard to tell if one rule specifically caused the change (clipping/kickoff format), both rules together did, or with the new rules, there was a crackdown on officiating. This change could also have been caused by unforseen factors, like age.
 
 ![Posterior Distribution 2](./images/ridge_posteriors2.png)
 
-Our attention gets shifted to an age distribution where we utilize the Dirichlet Conjugate Posterior Distribution for four different age bins. The percent makeup of 30+ year olds in the league remains around a constant theta distribution; however, the number of 20-24 year olds and 35+ year olds seams to shift and then realign with the start of the decade.
+Amid speculation that age is an unforseen factor (perhaps there is a greater proportion of older, more injury prone players present in the league), we utilize a Dirichlet Conjugate Posterior Distribution for four different age bins to gain insight on what distributions of ages occupy the NFL. It is discovered that the percent makeup of 30+ year olds in the league remains around a constant theta distribution; however, the number of 20-24 year olds and 35+ year olds seams to shift and then realign with the start of the decade.
 
 ![Posterior Distribution 3](./images/ridge_posteriors3.png)
 
