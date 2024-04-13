@@ -1,6 +1,5 @@
 # A Bayesian Analysis on NFL Injuries
-Author: Brandon Owens <br></br>
-Date: 4/10/2024
+![Injury Image](./images/injury_kneeling.jpg)
 
 ## Background
 The NFL is valued as a $163B organization where athletes compete for a total of 21-24 games during the season (3 preseason, 17 in-season, 1-4 post-season games). A major complaint of fans over the last couple of years has surrounded the significance of injuries on the sport in several ways:
@@ -45,4 +44,8 @@ From our three posterior distribution functions and many other exploratory data 
 * [images](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/tree/main/images) Contains relevant images for readme and notebook explanations.
 * [Notebook](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/blob/main/NFL_injuries_bayesian_analysis.Rmd) Contains full analysis and breakdown of the problem with executable code!
 * [Notebook html](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/blob/main/NFL_injury_bayesian_analysis.html) Contains raw html file.
+
+## About
+Author: Brandon Owens <br></br>
+Date: 4/10/2024
 
