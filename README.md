@@ -1,5 +1,4 @@
 # A Bayesian Analysis on NFL Injuries
-![Injury Image](./images/injury_kneeling.jpg)
 
 ## Background
 The NFL is valued as a $163B organization where athletes compete for a total of 21-24 games during the season (3 preseason, 17 in-season, 1-4 post-season games). A major complaint of fans over the last couple of years has surrounded the significance of injuries on the sport in several ways:
@@ -14,6 +13,8 @@ The NFL is valued as a $163B organization where athletes compete for a total of 
   * Organizations want players to be hurt to maintain fan interest and to not shell out "guaranteed" money for player contracts when those players aren't participating.
   
 With that being said, the NFL has instated over 50 rule changes to reduce player danger since 2002 alone.
+
+![Injury Image](./images/injury_kneeling.jpg)
 
 ## What Are We Looking At?
 Have these significant rule changes that have caused controversy really impacted the athlete's for the better? Many fans believe that the league is taking the fun out of the game by limiting exciting plays through hits, collissions, and game-officiating. Thus, are the rule changes actually helping to reduce injuries amongst athletes? That's what we are interested in.
