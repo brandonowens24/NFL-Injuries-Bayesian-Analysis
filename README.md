@@ -26,7 +26,7 @@ Drawing on information from 2009-2013, we use this prior knowledge to inform a m
 
 Utilizing a Beta Conjugate Posterior model, the most massive of the posterior distribution shift comes in 2016, where previously the distributions greatly reflected the prior. With this large shift, it is hard to tell if one rule specifically caused the change, both rules together did, or with the new rules, there was a crackdown on officiating. This change could also have been caused by unforseen factors, like age.
 
-![Posterior Distribution 2](./images/ridgeposteriors2.png)
+![Posterior Distribution 2](./images/ridge_posteriors2.png)
 
 Our attention gets shifted to an age distribution where we utilize the Dirichlet Conjugate Posterior Distribution for four different age bins. The percent makeup of 30+ year olds in the league remains around a constant theta distribution; however, the number of 20-24 year olds and 35+ year olds seams to shift and then realign with the start of the decade.
 
