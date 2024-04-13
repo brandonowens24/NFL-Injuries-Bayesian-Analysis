@@ -19,43 +19,23 @@ With that being said, the NFL has instated over 50 rule changes to reduce player
 ## What Are We Looking At?
 Have these significant rule changes that have caused controversy really impacted the athlete's for the better? Many fans believe that the league is taking the fun out of the game by limiting exciting plays through hits, collissions, and game-officiating. Thus, are the rule changes actually helping to reduce injuries amongst athletes? That's what we are interested in.
 
-Drawing on information from 2009-2013, we use this prior knowledge to inform a binomial likelihood of the number of players that get hurt in a season compared to all players in the National Football League. This allows us to form beta posterior distributions of what we can confidently predict the percentage of players we'd have expected to have gotten hurt from the 2014-2023 seasons. We are interested in analyzing **if protocols set by the NFL to reduce player injury are successful or not over the last 10 years**.
+Drawing on information from 2009-2013, we use this prior knowledge to inform a multiple models (beta congjugate, dirichlet conjugate, and another beta conjugate model) to gain insight on **whether protocols set by the NFL to reduce player injury are successful or not over the last 10 years**.
 
 ## Findings
 ![Posterior Distributions](./images/ridge_posteriors.png)
 
-The most massive of the posterior distribution shift comes in 2016, where previously the distributions greatly reflected the prior. With this large shift, it is hard to tell if one rule specifically caused the change, both rules together did, or with the new rules, there was a crackdown on officiating. 
+Utilizing a Beta Conjugate Posterior model, the most massive of the posterior distribution shift comes in 2016, where previously the distributions greatly reflected the prior. With this large shift, it is hard to tell if one rule specifically caused the change, both rules together did, or with the new rules, there was a crackdown on officiating. This change could also have been caused by unforseen factors, like age.
 
-Some of the major rule changes that may explain the posteriors are as follows (from [NFL.com](https://www.nfl.com/playerhealthandsafety/equipment-and-innovation/rules-changes/nfl-health-and-safety-related-rules-changes-since-2002)):
+![Posterior Distribution 2](./images/ridgeposteriors2.png)
 
-* **2014:** 
-  * Clipping and unnecessary roughness penalties expanded to prohibit blockers from rolling up the side of a defender's leg.
-* **2015:**
-  * "Peel back" blocks extended to offensive players.
-  * Backs prohibited from chopping defensive players outside of tackle box.
-  * No pushing teammates during kicking attempts.
-  * Defenseless player protection expanded to receiver of a pass.
-* **2016:**
-  * Chop blocks prohibited.
-  * Horse collar rule expanded.
-  * Move touchback reception to 25 yard line.
-* **2017:**
-  * Prohibits "leaper" blocks on kicks.
-  * Receivers running routes get defenseless player protections.
-  * Prohibits crack-back blocks for players in motion.
-* **2018:**
-  *Lowering the head is officially a penalty to make a tackle.
-* **2019:**
-  * Expanded protection to defenseless players when initiating a block.
-* **2020:**
-  * Defenseless player protection expanded to returners.
-  * Initial line blocking with the helmet removed.
-* **2023:**
-  * Fair catch goes to team's 25 yard line hoping for more instances of fair catches.
-  * Expands Impermissible Use of the helmet calls.
+Our attention gets shifted to an age distribution where we utilize the Dirichlet Conjugate Posterior Distribution for four different age bins. The percent makeup of 30+ year olds in the league remains around a constant theta distribution; however, the number of 20-24 year olds and 35+ year olds seams to shift and then realign with the start of the decade.
+
+![Posterior Distribution 3](./images/ridge_posteriors3.png)
+
+Because of the slight change in 20-24 year old distribution, we decide to check on the percentage of players that get hurt compared to all players present that are that age. The results are pretty alarming and display that athletes from 20-24 years old have a much more likely chance of becoming injured. Whether this is due load management, increased volume compared to older players, the verocity of a new, intense league, newer sports science training that has progressed explosive movement too fast, or other reasons, it is unclear.
 
 
-Regardless, the previous four seasons have completely remained outside of our Prior distributions 95% confidence interval, signifying changes for the better when it comes to new rules and officiating! Next season will see updates to the entire format of the kickoff play and the swivel hip-drop tackle -- two instances of the game highly scrutinized for being dangerous... but also causing controversy with how difficult it will now be to tackle quarterbacks and larger players from behind.
+From our three posterior distribution functions and many other exploratory data wranglings and visualizations, we are able to demonstrate that there has been a definite shift in the injury rate in the NFL in the last 10 years for the better. While it seems like injuries to younger players have gotten worse and the influx of younger athletes has swung, the injury likelihood for older athletes has significantly dropped. This demonstrates that age is a factor for players getting injured, but doesn't quite explain the dropoff of injury rate within the league. Other factors should be explored to fully assert the claim that NFL rules are indeed reducing injury likelihood amongst athletes. Meanwhile, the findings from this analysis have demonstrates a need for better rehabiliation, therapy, and training methods for younger athletes entering the NFL.
 
 ## Run It For Yourself!
 1. Install Necessary Packages (found in the top of the [Notebook](https://github.com/brandonowens24/NFL-Injuries-Bayesian-Analysis/blob/main/NFL_injuries_bayesian_analysis.Rmd)
